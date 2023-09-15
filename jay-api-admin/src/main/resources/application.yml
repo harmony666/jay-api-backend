@@ -1,0 +1,82 @@
+# 公共配置文件
+spring:
+  application:
+    name: jay-api-backend
+
+  # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/jay_api
+    username: root
+    password: xxxxxx
+
+  # 默认 dev 环境
+  profiles:
+    active: dev
+
+  # 支持 swagger3
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  # session 配置
+  session:
+    timeout: 2592000
+    store-type: redis
+
+  # Redis 配置
+  redis:
+    port: 6379
+    host: localhost
+    database: 0
+    password: xxxxxx
+    timeout: 5000
+
+  # 文件上传
+  servlet:
+    multipart:
+      max-file-size: 10MB  # 大小限制
+
+server:
+#  address: 0.0.0.0
+  port: 8101
+  servlet:
+    context-path: /api
+    # cookie 30 天过期
+    session:
+      cookie:
+        max-age: 2592000
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: false
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: isDelete # 全局逻辑删除的实体字段名
+      logic-delete-value: 1 # 逻辑已删除值（默认为 1）
+      logic-not-delete-value: 0 # 逻辑未删除值（默认为 0）
+
+# 阿里云对象存储
+aliyun:
+  oss:
+    endpoint: xxxxxx
+    urlPrefix: xxxxxx
+    accessKeyId: xxxxxx
+    accessKeySecret: xxxxxx
+    bucketName: xxxxxx
+    fileHost: files
+
+jay:
+  gateway:
+    host: http://localhost:8090
+
+dubbo:
+  application:
+    name: xxxxxx
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    id: nacos-registry
+    address: nacos://localhost:8848
