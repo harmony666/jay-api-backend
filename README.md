@@ -32,7 +32,10 @@
 - jay-api-interface: 提供模拟API接口。
 - jay-client-sdk：客户端SDK，封装了对各API接口的调用方法，降低开发者的使用成本。
 
-![](assets/image-20230915225042267.png)
+<div align="center">
+  <img src="assets/image-20230915225042267.png" />
+</div>
+
 
 1. 在application.yml文件中，将redis、mysql、阿里云oss、nacos等配置修改为你自己的。
 
