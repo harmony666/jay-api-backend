@@ -1,18 +1,27 @@
 package cn.ichensw.jayapiadmin;
 
-import java.util.Scanner;
-
+import java.util.*;
 public class test1 {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
-        int[] dp = new int[n + 1];
-        for (int i = 1; i <= n; i++) {
-            dp[i] = i * 4; // 初始化为每块巧克力板只有一单位面积的情况
-            for (int j = 1; j * j <= i; j++) {
-                dp[i] = Math.min(dp[i], dp[i - j * j] + j * 4); // 动态规划，更新最小周长
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        int q = scanner.nextInt();
+        scanner.nextLine();
+        String text = scanner.nextLine();
+
+        // 预处理所有长度不超过10的子串
+        Map<String, Integer> counts = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j <= Math.min(i + 10, n); j++) {
+                String sub = text.substring(i, j);
+                counts.put(sub, counts.getOrDefault(sub, 0) + 1);
             }
         }
-        System.out.println(dp[n]);
+
+        // 查询
+        for (int i = 0; i < q; i++) {
+            String query = scanner.nextLine();
+            System.out.println(counts.getOrDefault(query, 0));
+        }
     }
 }

@@ -1,34 +1,51 @@
 package cn.ichensw.jayapiadmin;
 
-import java.util.Scanner;
+import java.util.*;
 
 public class test2 {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        int n = scanner.nextInt(); // 木棍数量
-        int k = scanner.nextInt(); // 最多移动操作次数
-        int[] a = new int[n]; // 初始算珠数量
-
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        long[] a = new long[n];
+        long[] b = new long[n];
         for (int i = 0; i < n; i++) {
-            a[i] = scanner.nextInt();
+            a[i] = sc.nextLong();
+        }
+        for (int i = 0; i < n; i++) {
+            b[i] = sc.nextLong();
+        }
+        System.out.println(maxZeros(a, b, n));
+    }
+
+    public static int maxZeros(long[] a, long[] b, int n) {
+        if (n == 1) {
+            return b[0] == 0 ? 1 : 0;
         }
 
-        // 移动算珠以获得最小字典序数组
-        for (int i = 0; i < n - 1; i++) {
-            int move = Math.min(k, a[i]); // 可以移动的算珠数量
-            a[i] -= move; // 移动算珠
-            a[n - 1] += move; // 移动的算珠放到最后一个木棍上
-            k -= move; // 更新剩余移动次数
-        }
-
-        // 输出结果
+        List<Double> list = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            System.out.print(a[i]);
-            if (i < n - 1) {
-                System.out.print(" ");
+            if (a[i] == 0 && b[i] == 0) {
+                continue;
             }
+            if (a[i] == 0) {
+                continue;
+            }
+            double mul = -(double)b[i] / a[i];
+            list.add(mul);
         }
-        System.out.println();
+
+        Collections.sort(list);
+
+        int maxCount = 1, count = 1;
+        for (int i = 1; i < list.size(); i++) {
+            if (Math.abs(list.get(i) - list.get(i - 1)) < 1e-9) {
+                count++;
+            } else {
+                count = 1;
+            }
+            maxCount = Math.max(maxCount, count);
+        }
+
+        return maxCount;
     }
 }
-
