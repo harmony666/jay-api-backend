@@ -37,10 +37,7 @@ import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -67,6 +64,12 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
+    /**
+     * filter是Spring Cloud Gateway中的一个接口方法，用于实现自定义的过滤器逻辑
+     * @param exchange 表示当前请求和响应的上下文对象，包含了请求和响应的相关信息，比如请求头、请求体、响应头、响应体等
+     * @param chain 表示当前过滤器链，通过chain.filter(exchange)方法可以将请求传递给下一个过滤器进行处理，如果没有下一个过滤器，则请求传递给目标服务
+     * @return
+     */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         // 1. 请求日志
@@ -165,12 +168,14 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
      */
     private Mono<Void> handleResponse(ServerWebExchange exchange, GatewayFilterChain chain, long interfaceInfoId, long userId, String nonce) {
         try {
+            // 首先获取原始的响应对象originalResponse和数据缓冲区工厂bufferFactory
             ServerHttpResponse originalResponse = exchange.getResponse();
             DataBufferFactory bufferFactory = originalResponse.bufferFactory();
-
+            // 获取响应状态码statusCode，如果状态码为HttpStatus.OK，则表示接口调用成功，可以对响应结果进行处理。
             HttpStatus statusCode = originalResponse.getStatusCode();
 
             if (statusCode == HttpStatus.OK) {
+                // 重写decoratedResponse的writeWith方法，对响应结果进行处理。
                 ServerHttpResponseDecorator decoratedResponse = new ServerHttpResponseDecorator(originalResponse) {
                     @Override
                     public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
@@ -227,6 +232,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
     }
 
     private void postHandler(ServerHttpResponse response, Long interfaceInfoId, Long userId, String nonce) {
+        // 使用redissonClient获取一个名为api:add_interface_num的锁RLock，用于控制接口调用次数的并发访问
         RLock lock = redissonClient.getLock("api:add_interface_num");
         if (response.getStatusCode() == HttpStatus.OK) {
             CompletableFuture.runAsync(() -> {
@@ -253,7 +259,15 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         if (userInterfaceInfo != null && userInterfaceInfo.getLeftNum() <= 0) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "调用次数已用完！");
         }
-        redisTemplate.opsForValue().set(nonce, 1, 5, TimeUnit.MINUTES);
+        // todo 在接口调用成功后，使用redisTemplate,限制接口调用频率
+        long currentTimeStamp = System.currentTimeMillis();
+        String key = "api:limit:" + userId;
+        redisTemplate.opsForZSet().add(key, nonce, currentTimeStamp);
+        redisTemplate.opsForZSet().removeRangeByScore(key, 0, currentTimeStamp - TimeUnit.MINUTES.toMillis(5));
+        if (redisTemplate.opsForZSet().size(key) > 5) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"超出请求频率");
+        }
+        // invokeCount 修改用户接口表的调用次数
         innerUserInterfaceInfoService.invokeCount(interfaceInfoId, userId);
     }
 }

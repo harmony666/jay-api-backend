@@ -9,8 +9,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @MapperScan("cn.ichensw.jayapiadmin.mapper")
-@EnableScheduling
-@EnableAspectJAutoProxy(proxyTargetClass = true, exposeProxy = true)
+@EnableScheduling // 用于启用定时任务的支持
+@EnableAspectJAutoProxy(proxyTargetClass = true, exposeProxy = true) // 用于启用AspectJ切面支持
 @EnableDubbo
 public class JayApiAdminApplication {
 

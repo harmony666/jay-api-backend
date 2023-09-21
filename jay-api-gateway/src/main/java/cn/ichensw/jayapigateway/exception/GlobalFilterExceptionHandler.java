@@ -28,6 +28,7 @@ public class GlobalFilterExceptionHandler implements ErrorWebExceptionHandler {
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
         ServerHttpResponse response = exchange.getResponse();
+        // 检查响应是否已经提交，如果提交，则返回一个错误
         if (response.isCommitted()) {
             return Mono.error(ex);
         }
@@ -39,6 +40,12 @@ public class GlobalFilterExceptionHandler implements ErrorWebExceptionHandler {
         return handleBusinessException(exchange, ex);
     }
 
+    /**
+     * 处理业务异常
+     * @param exchange
+     * @param ex
+     * @return
+     */
     public Mono<Void> handleBusinessException(ServerWebExchange exchange, Throwable ex) {
         ServerHttpResponse response = exchange.getResponse();
         return response.writeWith(Mono.fromSupplier(() -> {
@@ -46,6 +53,7 @@ public class GlobalFilterExceptionHandler implements ErrorWebExceptionHandler {
             try {
                 response.setStatusCode(HttpStatus.FORBIDDEN);
                 log.error("{}\n {}", ex.getMessage(), ex.getStackTrace());
+                // 使用BaseResponse类和ResultUtils类来构造响应体
                 BaseResponse<String> fail = ResultUtils.fail(ex.getMessage());
                 log.error("{}",fail);
                 return bufferFactory.wrap(objectMapper.writeValueAsBytes(fail));
