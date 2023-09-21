@@ -16,11 +16,11 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 /**
- * 全局异常处理器
+ * 全局异常处理器，用于处理请求过程中抛出的异常
  *
  */
 @Slf4j
-@Component
+@Component // 这个注解表示这个类是一个Spring管理的组件，可以自动地注入到其他组件中
 public class GlobalFilterExceptionHandler implements ErrorWebExceptionHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -29,7 +29,6 @@ public class GlobalFilterExceptionHandler implements ErrorWebExceptionHandler {
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
         ServerHttpResponse response = exchange.getResponse();
         if (response.isCommitted()) {
-
             return Mono.error(ex);
         }
         // 设置返回JSON

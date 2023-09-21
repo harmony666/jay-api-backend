@@ -34,7 +34,13 @@ public class JayApiClient {
         GATEWAY_HOST = gatewayHost;
     }
 
-
+    /**
+     * 用于构建请求头
+     * @param body 请求体
+     * @param method 请求方法
+     * @return 返回一个构建好的请求头
+     * @throws UnsupportedEncodingException
+     */
     private Map<String, String> getHeaderMap(String body, String method) throws UnsupportedEncodingException {
         HashMap<String, String> map = new HashMap<>();
         map.put("accessKey", accessKey);
@@ -47,6 +53,14 @@ public class JayApiClient {
         return map;
     }
 
+    /**
+     * 向网关地址发送http请求，并添加请求头信息，最后返回响应的结果
+     * @param params
+     * @param url
+     * @param method
+     * @return
+     * @throws UnsupportedEncodingException
+     */
     public String invokeInterface(String params, String url, String method) throws UnsupportedEncodingException {
         HttpResponse httpResponse = HttpRequest.post(GATEWAY_HOST + url)
                 .header("Accept-Charset", CharsetUtil.UTF_8)

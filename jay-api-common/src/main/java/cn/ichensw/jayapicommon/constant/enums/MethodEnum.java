@@ -11,8 +11,7 @@ public enum MethodEnum {
      *
      */
     GET(0,"GET"),
-    POST(1,"POST")
-    ;
+    POST(1,"POST");
     int code;
     String desc;
 

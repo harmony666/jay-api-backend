@@ -14,6 +14,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+/**
+ * 用于配置Redis模版，以便在Spring应用程序中使用Redis作为数据存储
+ *
+ */
 @Configuration
 public class RedisTemplateConfig {
 

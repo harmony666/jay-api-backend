@@ -17,6 +17,8 @@ public enum ErrorCode {
 
     /**
      * 状态码
+     * final 关键字意味着一旦这个变量被初始化，就不能在修改它的值，这样做的好处是可以保证ErrorCode枚举类型中的每个错误码都是不可改变的，从而避免
+     * 在代码中意外修改错误码的值而引起的错误
      */
     private final int code;
 
